@@ -76,6 +76,8 @@ services:
         max-size: "10m"
         max-file: "5"
         compress: "true"
+    networks:
+      - app_network
 
   bot:
     build:

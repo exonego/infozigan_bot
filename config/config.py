@@ -5,10 +5,7 @@ from dataclasses import dataclass
 from pydantic import SecretStr, PostgresDsn
 from environs import Env
 
-logger = logging.getLogger(__name__)
-
-# For development
-in_docker = os.path.exists("/.dockerenv")
+logger = logging.Logger(__name__)
 
 
 @dataclass
@@ -48,6 +45,10 @@ class Config:
 
 def load_config(path: str | None = None) -> Config:
     "Loads configuration for the app."
+
+    # For development
+    _is_docker = os.path.exists("/.dockerenv")
+
     env = Env()
 
     if path:
@@ -64,7 +65,7 @@ def load_config(path: str | None = None) -> Config:
     admin_id = env.int("ADMIN_ID")
 
     db_name = env("POSTGRES_DB")
-    db_host = env("POSTGRES_HOST") if in_docker else "localhost"
+    db_host = env("POSTGRES_HOST") if _is_docker else "localhost"
     db_port = env.int("POSTGRES_PORT")
     db_username = env("POSTGRES_USER")
     db_password = SecretStr(env("POSTGRES_PASSWORD"))
@@ -73,7 +74,7 @@ def load_config(path: str | None = None) -> Config:
     )
 
     redis = RedisSettings(
-        host=env("REDIS_HOST") if in_docker else "localhost",
+        host=env("REDIS_HOST") if _is_docker else "localhost",
         port=env.int("REDIS_PORT"),
         db=env.int("REDIS_DATABASE"),
         password=SecretStr(env("REDIS_PASSWORD")),

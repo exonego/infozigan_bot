@@ -10,6 +10,7 @@ class User(Base):
     __tablename__ = "users"
 
     tg_id: Mapped[int] = mapped_column(BigInteger, primary_key=True, index=True)
+    role: Mapped[str] = mapped_column(Text, nullable=False)
     language: Mapped[str] = mapped_column(Text, nullable=False)
     banned: Mapped[bool] = mapped_column(
         Boolean, nullable=False, server_default=text("false")

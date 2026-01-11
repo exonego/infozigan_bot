@@ -9,12 +9,20 @@ from aiogram_dialog import setup_dialogs
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
+from bot.handling.handlers.start_command import start_router
+from bot.handling.dialogs import user_router
+from bot.handling.middlewares import (
+    DbSessionMiddleware,
+    ShadowBanMiddleware,
+    TranslatorRunnerMiddleware,
+    RoleMiddleware,
+)
 from config.config import Config
 from I18N import i18n_factory
 
 
 # Module logger init
-logger = logging.getLogger(__name__)
+logger = logging.Logger(__name__)
 
 
 # Function for config and launch bot
@@ -57,9 +65,18 @@ async def main(config: Config) -> None:
     logger.info("Setting up dialogs...")
     setup_dialogs(dp)
 
-    # Include routers into dispatcher
+    # Include routers
+    logger.info("Including routers into dispatcher...")
+    dp.include_routers(start_router, user_router)
 
     # Register middlewares
+    logger.info("Registration middlewares...")
+    dp.update.outer_middleware(DbSessionMiddleware(session_pool=Sessionmaker))
+    dp.update.outer_middleware(ShadowBanMiddleware())
+    dp.update.outer_middleware(
+        TranslatorRunnerMiddleware(translator_hub=translator_hub)
+    )
+    dp.update.outer_middleware(RoleMiddleware())
 
     # Start polling
     await dp.start_polling(bot, admin_id=config.bot.admin_id)

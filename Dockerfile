@@ -1,7 +1,7 @@
 # build
 FROM python:3.13-slim-bullseye as compile-image
 
-WORKDIR /app
+WORKDIR /infozigan_bot
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
@@ -20,7 +20,7 @@ RUN pip install --no-cache-dir --upgrade pip \
 # run
 FROM python:3.13-slim-bullseye as run-image
 
-WORKDIR /app
+WORKDIR /infozigan_bot
 
 COPY --from=compile-image /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH" \

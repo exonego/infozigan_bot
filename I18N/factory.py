@@ -12,7 +12,10 @@ def i18n_factory() -> TranslatorHub:
                 locale="ru",
                 translator=FluentBundle.from_files(
                     locale="ru",
-                    filenames=[],
+                    filenames=[
+                        f"{DIR_PATH}/ru/LC_MESSAGES/user.ftl",
+                        f"{DIR_PATH}/ru/LC_MESSAGES/admin.ftl",
+                    ],
                 ),
             )
         ],
