@@ -82,9 +82,9 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: infozigan_app
-    restart: unless-stopped
     env_file:
       - .env
+    restart: unless-stopped
     # Important: wait for db and redis to be ready
     depends_on:
       postgres:
