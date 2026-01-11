@@ -1,14 +1,21 @@
-# sensitive data
+# Secret data
 .env
 
-# Virtual environment directory
+# Virtual environment
 .venv/
 
-# Migration files (temporarily, while models are under development)
-database/migrations/versions/
+# Python
+**/__pycache__/
+*.py[cod]
+*$py.class
 
-# Generated files
-.mypy_cache/
-__pycache__/
+# IDE & OS
 .vscode/
+.idea/
 .DS_Store
+*.swp
+
+# Tests and static analysis
+.mypy_cache/
+.pytest_cache/
+.coverage

@@ -1,0 +1,36 @@
+# Secret data
+.env
+*.secrets
+certs/
+
+# Python
+**/__pycache__/
+**/*.py[cod]
+**/*$py.class
+.pytest_cache/
+.mypy_cache/
+.coverage
+
+# Virtual environment
+.venv/
+
+# Git and documentation
+.git
+.gitignore
+README.md
+LICENSE
+.github/
+
+# IDE and system files
+.vscode/
+.idea/
+.DS_Store
+*.swp
+
+# Docker-files
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Development
+Makefile
