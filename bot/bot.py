@@ -10,7 +10,8 @@ from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
 from bot.handling.handlers.start_command import start_router
-from bot.handling.dialogs import user_router
+from bot.handling.handlers.user.payment import payment_router
+from bot.handling.dialogs import dialog_user_router
 from bot.handling.middlewares import (
     DbSessionMiddleware,
     ShadowBanMiddleware,
@@ -19,10 +20,11 @@ from bot.handling.middlewares import (
 )
 from config.config import Config
 from I18N import i18n_factory
+from utils.bootstrap import get_cur_price
 
 
 # Module logger init
-logger = logging.Logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 # Function for config and launch bot
@@ -67,7 +69,7 @@ async def main(config: Config) -> None:
 
     # Include routers
     logger.info("Including routers into dispatcher...")
-    dp.include_routers(start_router, user_router)
+    dp.include_routers(start_router, dialog_user_router, payment_router)
 
     # Register middlewares
     logger.info("Registration middlewares...")
@@ -79,4 +81,9 @@ async def main(config: Config) -> None:
     dp.update.outer_middleware(RoleMiddleware())
 
     # Start polling
-    await dp.start_polling(bot, admin_id=config.bot.admin_id)
+    await dp.start_polling(
+        bot,
+        admin_id=config.bot.admin_id,
+        yoo_token=config.yoo.token,
+        cur_price=await get_cur_price(engine=engine),
+    )

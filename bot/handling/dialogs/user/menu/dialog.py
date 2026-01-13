@@ -1,3 +1,5 @@
+import logging
+
 from aiogram.enums import ContentType
 from aiogram_dialog import Dialog, Window
 from aiogram_dialog.widgets.text import Const, Format
@@ -6,6 +8,9 @@ from aiogram_dialog.widgets.media import StaticMedia
 
 from bot.handling.states import MenuSG
 from bot.handling.dialogs.user.menu.getters import start_getter, description_getter
+from bot.handling.dialogs.user.menu.handlers import send_invoice_handler
+
+logger = logging.getLogger(__name__)
 
 
 menu_dialog = Dialog(
@@ -24,7 +29,9 @@ menu_dialog = Dialog(
             path="/infozigan_bot/assets/course_photo.jpg", type=ContentType.PHOTO
         ),
         Format("{description}"),
-        Button(text=Format("{button_pay}"), id="pay_access"),
+        Button(
+            text=Format("{button_pay}"), id="pay_access", on_click=send_invoice_handler
+        ),
         getter=description_getter,
         state=MenuSG.description,
     ),

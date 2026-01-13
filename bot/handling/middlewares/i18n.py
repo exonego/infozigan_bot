@@ -9,7 +9,7 @@ from fluentogram import TranslatorHub
 
 from database import User as DBUser
 
-logger = logging.Logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class TranslatorRunnerMiddleware(BaseMiddleware):

@@ -11,7 +11,7 @@ from bot.enums.roles import Role
 from bot.handling.states import MenuSG
 from database import Requests, User
 
-logger = logging.Logger(__name__)
+logger = logging.getLogger(__name__)
 
 requests = Requests()
 start_router = Router()

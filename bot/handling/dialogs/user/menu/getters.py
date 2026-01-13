@@ -1,3 +1,6 @@
+import logging
+
+from decimal import Decimal
 from typing import TYPE_CHECKING
 
 from aiogram_dialog import DialogManager
@@ -5,6 +8,8 @@ from fluentogram import TranslatorRunner
 
 if TYPE_CHECKING:
     from I18N.locales.stub import TranslatorRunner  # type: ignore
+
+logger = logging.getLogger(__name__)
 
 
 async def start_getter(
@@ -20,7 +25,8 @@ async def start_getter(
 async def description_getter(
     dialog_manager: DialogManager, i18n: TranslatorRunner, **kwargs
 ) -> dict[str, str]:
+    cur_price: Decimal = dialog_manager.middleware_data.get("cur_price")
     return {
-        "description": i18n.menu.description(),
-        "button_pay": i18n.menu.button.pay(),
+        "description": i18n.menu.description(price=cur_price),
+        "button_pay": i18n.menu.button.pay(price=cur_price),
     }

@@ -5,7 +5,7 @@ from aiogram.types import Message, CallbackQuery
 
 from bot.enums.roles import Role
 
-logger = logging.Logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class RoleFilter(BaseFilter):

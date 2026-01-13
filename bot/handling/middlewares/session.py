@@ -7,7 +7,7 @@ from aiogram.types import Update
 
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
-logger = logging.Logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class DbSessionMiddleware(BaseMiddleware):

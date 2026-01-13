@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from database import Requests, User as DBUser
 from bot.enums.roles import Role
 
-logger = logging.Logger(__name__)
+logger = logging.getLogger(__name__)
 requests = Requests()
 
 

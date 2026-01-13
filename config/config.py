@@ -36,11 +36,17 @@ class LogSettings:
 
 
 @dataclass
+class YooSettings:
+    token: SecretStr
+
+
+@dataclass
 class Config:
     bot: BotSettings
     db: DBSettings
     redis: RedisSettings
     log: LogSettings
+    yoo: YooSettings
 
 
 def load_config(path: str | None = None) -> Config:
@@ -85,7 +91,13 @@ def load_config(path: str | None = None) -> Config:
         level=env("LOG_LEVEL"), format=env("LOG_FORMAT"), style=env("LOG_STYLE")
     )
 
+    yoo = YooSettings(token=SecretStr(env("YOO_TOKEN")))
+
     logger.info("Configuration loaded successfully")
     return Config(
-        bot=BotSettings(token=token, admin_id=admin_id), db=db, redis=redis, log=log
+        bot=BotSettings(token=token, admin_id=admin_id),
+        db=db,
+        redis=redis,
+        log=log,
+        yoo=yoo,
     )

@@ -15,7 +15,7 @@ stub:  ## Generate Fluentogram stubs
 	python -X utf8 -m fluentogram -d ./I18N/locales/ru/LC_MESSAGES/ -o ./I18N/locales/stub.pyi
 	@echo "Done!"
 
-migration:  ## Create a new alembic migration. Usage: make mig m="message"
+mig:  ## Create a new alembic migration. Usage: make mig m="message"
 	@echo "Creating migration: $(m)"
 	alembic revision --autogenerate -m "$(m)"
 

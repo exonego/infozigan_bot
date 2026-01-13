@@ -9,9 +9,11 @@ from bot.bot import main
 config = load_config()
 
 logging.basicConfig(
-    level=logging.getLevelName(level=config.log.level),
+    level=config.log.level,
     format=config.log.format,
     style=config.log.style,
+    handlers=[logging.StreamHandler(sys.stdout)],
+    force=True
 )
 
 if sys.platform.startswith("win") or os.name == "nt":
