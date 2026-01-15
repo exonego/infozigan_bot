@@ -1,9 +1,15 @@
+import logging
+from datetime import datetime
 from decimal import Decimal
 
-from sqlalchemy import select, desc
+from aiogram import Bot
+from aiogram.types import FSInputFile
+from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 
 from database import Price
+
+logger = logging.getLogger(__name__)
 
 
 class PriceNotFoundError(Exception):
@@ -22,3 +28,22 @@ async def get_cur_price(engine: AsyncEngine) -> Decimal:
         if last_price is None:
             raise PriceNotFoundError()
         return last_price.price
+
+
+async def upload_assets(bot: Bot, chat_id: int) -> dict[str, int]:
+    """Upload assets in chat and return them file_id's in dict"""
+    assets = {
+        "greeting": "/infozigan_bot/assets/greeting_photo.jpg",
+        "course": "/infozigan_bot/assets/course_photo.jpg",
+    }
+    result = dict()
+    for key, path in assets.items():
+        logger.info(f"Loading the {key} asset...")
+        photo = FSInputFile(path)
+        msg = await bot.send_photo(
+            chat_id=chat_id, photo=photo, caption=f"{key}: {datetime.now()}"
+        )
+        result[key] = msg.photo[-1].file_id
+        logger.info(f"The {key} asset loaded")
+
+    return result

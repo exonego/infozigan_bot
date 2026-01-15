@@ -11,6 +11,7 @@ logger = logging.Logger(__name__)
 @dataclass
 class BotSettings:
     token: SecretStr
+    assets_chat_id: int
     admin_id: int
 
 
@@ -51,10 +52,6 @@ class Config:
 
 def load_config(path: str | None = None) -> Config:
     "Loads configuration for the app."
-
-    # For development
-    _is_docker = os.path.exists("/.dockerenv")
-
     env = Env()
 
     if path:
@@ -64,11 +61,18 @@ def load_config(path: str | None = None) -> Config:
             logger.info(f"Loading .env file from '{path}'...")
     env.read_env(path)
 
+    # For development
+    _is_docker = env.bool("RUNNING_IN_DOCKER", False)
+
     token = SecretStr(env("BOT_TOKEN"))
     if not token:
         raise ValueError("BOT_TOKEN must not be empty")
 
-    admin_id = env.int("ADMIN_ID")
+    bot = BotSettings(
+        token=token,
+        assets_chat_id=env.int("ASSETS_CHAT_ID"),
+        admin_id=env.int("ADMIN_ID"),
+    )
 
     db_name = env("POSTGRES_DB")
     db_host = env("POSTGRES_HOST") if _is_docker else "localhost"
@@ -95,7 +99,7 @@ def load_config(path: str | None = None) -> Config:
 
     logger.info("Configuration loaded successfully")
     return Config(
-        bot=BotSettings(token=token, admin_id=admin_id),
+        bot=bot,
         db=db,
         redis=redis,
         log=log,

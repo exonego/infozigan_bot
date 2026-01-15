@@ -21,3 +21,6 @@ mig:  ## Create a new alembic migration. Usage: make mig m="message"
 
 up: ## Rebuild and start docker containers
 	docker compose up --build
+
+down: ## Stop docker containers
+	docker compose down

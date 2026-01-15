@@ -20,7 +20,7 @@ from bot.handling.middlewares import (
 )
 from config.config import Config
 from I18N import i18n_factory
-from utils.bootstrap import get_cur_price
+from utils.bootstrap import upload_assets, get_cur_price
 
 
 # Module logger init
@@ -57,7 +57,7 @@ async def main(config: Config) -> None:
 
     # Init Bot and Dispatcher
     logger.info("Init bot and dispatcher...")
-    bot = Bot(
+    tg_bot = Bot(
         token=config.bot.token.get_secret_value(),
         default=DefaultBotProperties(parse_mode=ParseMode.HTML),
     )
@@ -82,8 +82,9 @@ async def main(config: Config) -> None:
 
     # Start polling
     await dp.start_polling(
-        bot,
+        tg_bot,
         admin_id=config.bot.admin_id,
         yoo_token=config.yoo.token,
+        photo_ids=await upload_assets(bot=tg_bot, chat_id=config.bot.assets_chat_id),
         cur_price=await get_cur_price(engine=engine),
     )
