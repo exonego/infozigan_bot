@@ -20,4 +20,4 @@ mig:  ## Create a new alembic migration. Usage: make mig m="message"
 	alembic revision --autogenerate -m "$(m)"
 
 up: ## Rebuild and start docker containers
-	docker-compose up --build
+	docker compose up --build
