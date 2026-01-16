@@ -1,5 +1,5 @@
 # build
-FROM python:3.13-slim-bullseye as compile-image
+FROM python:3.12-slim-bullseye as compile-image
 
 WORKDIR /infozigan_bot
 
@@ -18,7 +18,7 @@ RUN pip install --no-cache-dir --upgrade pip \
 
 
 # run
-FROM python:3.13-slim-bullseye as run-image
+FROM python:3.12-slim-bullseye as run-image
 
 WORKDIR /infozigan_bot
 

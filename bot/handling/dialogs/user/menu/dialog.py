@@ -22,10 +22,12 @@ menu_dialog = Dialog(
         state=MenuSG.start,
     ),
     Window(
-        DynamicMedia(selector="course_photo"),
+        DynamicMedia(selector="course_video"),
         Format("{description}"),
         Button(
-            text=Format("{button_pay}"), id="pay_access", on_click=send_invoice_handler
+            text=Format("{button_pay_club}"),
+            id="pay_club",
+            on_click=send_invoice_handler,
         ),
         getter=description_getter,
         state=MenuSG.description,

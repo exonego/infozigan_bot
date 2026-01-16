@@ -1,5 +1,6 @@
 import os
 import logging
+from typing import Literal
 from dataclasses import dataclass
 
 from pydantic import SecretStr, PostgresDsn
@@ -12,6 +13,7 @@ logger = logging.Logger(__name__)
 class BotSettings:
     token: SecretStr
     assets_chat_id: int
+    club_chat_id: int
     admin_id: int
 
 
@@ -33,7 +35,7 @@ class RedisSettings:
 class LogSettings:
     level: str
     format: str
-    style: str
+    style: Literal["%", "{", "$"]
 
 
 @dataclass
@@ -53,16 +55,16 @@ class Config:
 def load_config(path: str | None = None) -> Config:
     "Loads configuration for the app."
     env = Env()
-
-    if path:
-        if not os.path.exists(path):
-            logger.warning(f".env file was not fount in the '{path}'")
-        else:
-            logger.info(f"Loading .env file from '{path}'...")
-    env.read_env(path)
-
-    # For development
     _is_docker = env.bool("RUNNING_IN_DOCKER", False)
+
+    if not _is_docker:
+        if path:
+            if not os.path.exists(path):
+                logger.warning(f".env file was not fount in the '{path}'")
+            else:
+                logger.info(f"Loading .env file from '{path}'...")
+
+        env.read_env(path)
 
     token = SecretStr(env("BOT_TOKEN"))
     if not token:
@@ -71,6 +73,7 @@ def load_config(path: str | None = None) -> Config:
     bot = BotSettings(
         token=token,
         assets_chat_id=env.int("ASSETS_CHAT_ID"),
+        club_chat_id=env.int("CLUB_CHAT_ID"),
         admin_id=env.int("ADMIN_ID"),
     )
 

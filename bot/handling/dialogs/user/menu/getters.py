@@ -7,6 +7,9 @@ from aiogram.enums import ContentType
 from aiogram_dialog import DialogManager
 from aiogram_dialog.api.entities import MediaAttachment, MediaId
 from fluentogram import TranslatorRunner
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from utils.business_logic import get_cur_price
 
 if TYPE_CHECKING:
     from I18N.locales.stub import TranslatorRunner  # type: ignore
@@ -17,7 +20,7 @@ logger = logging.getLogger(__name__)
 async def start_getter(
     dialog_manager: DialogManager, i18n: TranslatorRunner, **kwargs
 ) -> dict[str, str | MediaAttachment]:
-    file_ids: dict[str, int] = dialog_manager.middleware_data.get("photo_ids")
+    file_ids: dict[str, int] = dialog_manager.middleware_data.get("file_ids")
     photo = MediaAttachment(
         type=ContentType.PHOTO, file_id=MediaId(file_ids.get("greeting"))
     )
@@ -33,14 +36,16 @@ async def start_getter(
 async def description_getter(
     dialog_manager: DialogManager, i18n: TranslatorRunner, **kwargs
 ) -> dict[str, str]:
-    cur_price: Decimal = dialog_manager.middleware_data.get("cur_price")
-    file_ids: dict[str, int] = dialog_manager.middleware_data.get("photo_ids")
-    photo = MediaAttachment(
-        type=ContentType.PHOTO, file_id=MediaId(file_ids.get("course"))
+    session: AsyncSession = dialog_manager.middleware_data.get("session")
+    file_ids: dict[str, int] = dialog_manager.middleware_data.get("file_ids")
+
+    cur_price_club: Decimal = await get_cur_price(session=session, title="club")
+    video = MediaAttachment(
+        type=ContentType.VIDEO, file_id=MediaId(file_ids.get("course"))
     )
 
     return {
-        "description": i18n.menu.description(price=cur_price),
-        "button_pay": i18n.menu.button.pay(price=cur_price),
-        "course_photo": photo,
+        "description": i18n.menu.description(price=cur_price_club),
+        "button_pay_club": i18n.menu.button.pay.club(price=cur_price_club),
+        "course_video": video,
     }

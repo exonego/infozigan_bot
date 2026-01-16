@@ -5,7 +5,6 @@ from aiogram.types import Message
 from aiogram.filters import CommandStart
 from aiogram_dialog import DialogManager, StartMode
 from sqlalchemy.ext.asyncio import AsyncSession
-from fluentogram import TranslatorRunner
 
 from bot.enums.roles import Role
 from bot.handling.states import MenuSG

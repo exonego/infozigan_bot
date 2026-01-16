@@ -20,8 +20,7 @@ from bot.handling.middlewares import (
 )
 from config.config import Config
 from I18N import i18n_factory
-from utils.bootstrap import upload_assets, get_cur_price
-
+from utils.bootstrap import upload_assets
 
 # Module logger init
 logger = logging.getLogger(__name__)
@@ -33,14 +32,15 @@ async def main(config: Config) -> None:
 
     # Init redis storage
     logger.info("Init redis storage...")
+    redis = Redis(
+        host=config.redis.host,
+        port=config.redis.port,
+        db=config.redis.db,
+        username=config.redis.username,
+        password=config.redis.password.get_secret_value(),
+    )
     storage = RedisStorage(
-        redis=Redis(
-            host=config.redis.host,
-            port=config.redis.port,
-            db=config.redis.db,
-            username=config.redis.username,
-            password=config.redis.password.get_secret_value(),
-        ),
+        redis=redis,
         key_builder=DefaultKeyBuilder(with_destiny=True),
     )
 
@@ -84,7 +84,9 @@ async def main(config: Config) -> None:
     await dp.start_polling(
         tg_bot,
         admin_id=config.bot.admin_id,
+        club_chat_id=config.bot.club_chat_id,
         yoo_token=config.yoo.token,
-        photo_ids=await upload_assets(bot=tg_bot, chat_id=config.bot.assets_chat_id),
-        cur_price=await get_cur_price(engine=engine),
+        file_ids=await upload_assets(
+            redis=redis, bot=tg_bot, chat_id=config.bot.assets_chat_id
+        ),
     )
