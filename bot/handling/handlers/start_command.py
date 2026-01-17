@@ -3,7 +3,7 @@ import logging
 from aiogram import Router
 from aiogram.types import Message
 from aiogram.filters import CommandStart
-from aiogram_dialog import DialogManager, StartMode
+from aiogram_dialog import DialogManager, StartMode, ShowMode
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from bot.enums.roles import Role

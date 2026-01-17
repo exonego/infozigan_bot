@@ -7,7 +7,10 @@ from aiogram_dialog.widgets.media import DynamicMedia
 
 from bot.handling.states import MenuSG
 from bot.handling.dialogs.user.menu.getters import start_getter, description_getter
-from bot.handling.dialogs.user.menu.handlers import send_invoice_handler
+from bot.handling.dialogs.user.menu.handlers import (
+    send_invoice_club_handler,
+    send_invoice_mentor_handler,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +30,12 @@ menu_dialog = Dialog(
         Button(
             text=Format("{button_pay_club}"),
             id="pay_club",
-            on_click=send_invoice_handler,
+            on_click=send_invoice_club_handler,
+        ),
+        Button(
+            text=Format("{button_pay_mentor}"),
+            id="pay_mentor",
+            on_click=send_invoice_mentor_handler,
         ),
         getter=description_getter,
         state=MenuSG.description,

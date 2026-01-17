@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 
 from aiogram import Bot, Router, F
 from aiogram.types import Message, PreCheckoutQuery
-from aiogram.enums import ContentType
+from aiogram.enums import ContentType, ChatMemberStatus
 from fluentogram import TranslatorRunner
 
 if TYPE_CHECKING:
@@ -25,9 +25,21 @@ async def process_succesful_payment(
     mesage: Message, bot: Bot, i18n: TranslatorRunner, club_chat_id: int
 ):
     if mesage.successful_payment.invoice_payload == "club":
-        club_access_link = await bot.create_chat_invite_link(
+        club_link = await bot.create_chat_invite_link(
             chat_id=club_chat_id, member_limit=1, name="club_link"
         )
         await mesage.answer(
-            text=i18n.successful.payment.club(link=club_access_link.invite_link)
+            text=i18n.successful.payment.club(link=club_link.invite_link)
         )
+    elif mesage.successful_payment.invoice_payload == "mentor":
+        if (
+            await bot.get_chat_member(chat_id=club_chat_id, user_id=mesage.from_user.id)
+        ).status == ChatMemberStatus.LEFT:
+            club_link = await bot.create_chat_invite_link(
+                chat_id=club_chat_id, member_limit=1, name="club_link"
+            )
+            await mesage.answer(
+                text=i18n.successful.payment.mentor.left(link=club_link.invite_link)
+            )
+        else:
+            await mesage.answer(text=i18n.successful.payment.mentor.member())

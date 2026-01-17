@@ -40,12 +40,18 @@ async def description_getter(
     file_ids: dict[str, int] = dialog_manager.middleware_data.get("file_ids")
 
     cur_price_club: Decimal = await get_cur_price(session=session, title="club")
+    cur_price_mentor: Decimal = await get_cur_price(session=session, title="mentor")
+
     video = MediaAttachment(
         type=ContentType.VIDEO, file_id=MediaId(file_ids.get("course"))
     )
 
     return {
-        "description": i18n.menu.description(price=cur_price_club),
+        "description": i18n.menu.description(
+            club_price=cur_price_club,
+            mentor_price=(cur_price_mentor),
+        ),
         "button_pay_club": i18n.menu.button.pay.club(price=cur_price_club),
+        "button_pay_mentor": i18n.menu.button.pay.mentor(price=cur_price_mentor),
         "course_video": video,
     }
