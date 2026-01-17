@@ -17,6 +17,10 @@ class Users:
     def set_role(self):
         return users.set_role
 
+    @property
+    def set_level(self):
+        return users.set_level
+
 
 @dataclass
 class Requests:

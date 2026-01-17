@@ -84,6 +84,7 @@ async def main(config: Config) -> None:
     await dp.start_polling(
         tg_bot,
         admin_id=config.bot.admin_id,
+        admin_username=config.bot.admin_username,
         club_chat_id=config.bot.club_chat_id,
         yoo_token=config.yoo.token,
         file_ids=await upload_assets(

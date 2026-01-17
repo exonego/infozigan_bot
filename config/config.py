@@ -15,6 +15,7 @@ class BotSettings:
     assets_chat_id: int
     club_chat_id: int
     admin_id: int
+    admin_username: str
 
 
 @dataclass
@@ -75,6 +76,7 @@ def load_config(path: str | None = None) -> Config:
         assets_chat_id=env.int("ASSETS_CHAT_ID"),
         club_chat_id=env.int("CLUB_CHAT_ID"),
         admin_id=env.int("ADMIN_ID"),
+        admin_username=env("ADMIN_USERNAME"),
     )
 
     db_name = env("POSTGRES_DB")

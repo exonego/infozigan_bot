@@ -11,6 +11,7 @@ class User(Base):
 
     tg_id: Mapped[int] = mapped_column(BigInteger, primary_key=True, index=True)
     role: Mapped[str] = mapped_column(Text, nullable=False)
+    level: Mapped[str] = mapped_column(Text)
     language: Mapped[str] = mapped_column(Text, nullable=False)
     banned: Mapped[bool] = mapped_column(
         Boolean, nullable=False, server_default=text("false")

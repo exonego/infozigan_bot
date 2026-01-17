@@ -49,7 +49,7 @@ class RoleMiddleware(BaseMiddleware):
                 data["role"] = Role.USER
             elif db_user.role == Role.USER and user.id == admin_id:
                 await requests.users.set_role(
-                    session=session, telegram_id=user.id, role=Role.ADMIN
+                    session=session, tg_id=user.id, role=Role.ADMIN
                 )
                 data["role"] = Role.ADMIN
             else:

@@ -1,5 +1,5 @@
 import logging
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import Decimal
 from typing import TYPE_CHECKING
 
 from pydantic import SecretStr
@@ -11,6 +11,8 @@ from aiogram_dialog.widgets.kbd import Button
 from fluentogram import TranslatorRunner
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from bot.enums.levels import Level
+from database import User
 from utils.business_logic import get_cur_price
 
 if TYPE_CHECKING:
@@ -23,6 +25,7 @@ async def send_invoice_club_handler(
     callback: CallbackQuery, button: Button, dialog_manager: DialogManager
 ) -> None:
     bot: Bot = dialog_manager.middleware_data.get("bot")
+    db_user: User = dialog_manager.middleware_data.get("db_user")
     club_chat_id: int = dialog_manager.middleware_data.get("club_chat_id")
     i18n: TranslatorRunner = dialog_manager.middleware_data.get("i18n")
 
@@ -30,7 +33,7 @@ async def send_invoice_club_handler(
         await bot.get_chat_member(chat_id=club_chat_id, user_id=callback.from_user.id)
     ).status
 
-    if user_status == ChatMemberStatus.LEFT:
+    if user_status == ChatMemberStatus.LEFT and db_user.level == Level.FREE:
         session: AsyncSession = dialog_manager.middleware_data.get("session")
 
         await dialog_manager.done()
@@ -52,6 +55,11 @@ async def send_invoice_club_handler(
         await callback.message.answer(text=i18n.menu.invoice.club.admin())
     elif user_status == ChatMemberStatus.KICKED:
         await callback.message.answer(text=i18n.menu.invoice.club.kicked())
+    else:
+        admin_username: str = dialog_manager.middleware_data.get("admin_username")
+        await callback.message.answer(
+            text=i18n.menu.invoice.club.leave(username=admin_username)
+        )
 
 
 async def send_invoice_mentor_handler(
@@ -59,18 +67,19 @@ async def send_invoice_mentor_handler(
 ) -> None:
     bot: Bot = dialog_manager.middleware_data.get("bot")
     session: AsyncSession = dialog_manager.middleware_data.get("session")
+    db_user: User = dialog_manager.middleware_data.get("db_user")
     club_chat_id: int = dialog_manager.middleware_data.get("club_chat_id")
     i18n: TranslatorRunner = dialog_manager.middleware_data.get("i18n")
+    admin_username: str = dialog_manager.middleware_data.get("admin_username")
 
     user_status = (
         await bot.get_chat_member(chat_id=club_chat_id, user_id=callback.from_user.id)
     ).status
 
-    cur_price_club: Decimal = await get_cur_price(session=session, title="club")
-    cur_price_mentor: Decimal = await get_cur_price(session=session, title="mentor")
     yoo_token: SecretStr = dialog_manager.middleware_data.get("yoo_token")
 
-    if user_status == ChatMemberStatus.LEFT:
+    if user_status == ChatMemberStatus.LEFT and db_user.level == Level.FREE:
+        cur_price_mentor: Decimal = await get_cur_price(session=session, title="mentor")
 
         await dialog_manager.done()
 
@@ -82,25 +91,39 @@ async def send_invoice_mentor_handler(
             currency="RUB",
             prices=[{"label": "RUB", "amount": int(cur_price_mentor * 100)}],
         )
-    elif user_status in (ChatMemberStatus.MEMBER, ChatMemberStatus.RESTRICTED):
+    elif (
+        user_status in (ChatMemberStatus.MEMBER, ChatMemberStatus.RESTRICTED)
+        and db_user.level == Level.CLUB
+    ):
+        cur_price_mentor_upgrade: Decimal = await get_cur_price(
+            session=session, title="mentor_upgrade"
+        )
+
         await dialog_manager.done()
 
-        cur_price_mentor = cur_price_mentor - cur_price_club.quantize(
-            exp=Decimal("1E3"), rounding=ROUND_HALF_UP
-        )
         await callback.message.answer(
-            text=i18n.menu.invoice.mentor.member(price=cur_price_mentor)
+            text=i18n.menu.invoice.mentor.member(price=cur_price_mentor_upgrade)
         )
         await callback.message.answer_invoice(
             title=i18n.menu.invoice.mentor.title(),
             description=i18n.menu.invoice.mentor.description(),
-            payload="mentor",
+            payload="mentor_upgrade",
             provider_token=yoo_token.get_secret_value(),
             currency="RUB",
-            prices=[{"label": "RUB", "amount": int(cur_price_mentor * 100)}],
+            prices=[{"label": "RUB", "amount": int(cur_price_mentor_upgrade * 100)}],
         )
-
+    elif (
+        user_status in (ChatMemberStatus.MEMBER, ChatMemberStatus.RESTRICTED)
+        and db_user.level == Level.MENTOR
+    ):
+        await callback.message.answer(
+            text=i18n.menu.invoice.mentor.mentor(username=admin_username)
+        )
     elif user_status in (ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.CREATOR):
         await callback.message.answer(text=i18n.menu.invoice.club.admin())
     elif user_status == ChatMemberStatus.KICKED:
         await callback.message.answer(text=i18n.menu.invoice.club.kicked())
+    else:
+        await callback.message.answer(
+            text=i18n.menu.invoice.club.leave(username=admin_username)
+        )
