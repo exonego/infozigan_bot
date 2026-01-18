@@ -4,12 +4,12 @@ from aiogram import Bot, Router
 from aiogram.types import Message
 from aiogram.enums import ChatMemberStatus
 from aiogram.filters import CommandStart
-from aiogram_dialog import DialogManager, StartMode, ShowMode
+from aiogram_dialog import DialogManager, StartMode
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from bot.enums.roles import Role
 from bot.enums.levels import Level
-from bot.handling.states import MenuSG
+from bot.handling.states import MenuSG, AdminMenuSG
 from database import Requests, User
 
 logger = logging.getLogger(__name__)
@@ -54,4 +54,4 @@ async def command_start(
             mode=StartMode.RESET_STACK,
         )
     else:
-        pass
+        await dialog_manager.start(state=AdminMenuSG.start, mode=StartMode.RESET_STACK)

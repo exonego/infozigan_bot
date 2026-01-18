@@ -24,10 +24,10 @@ class RoleFilter(BaseFilter):
         if not self.roles:
             raise ValueError("No valid roles passed to UserRoleFilter")
 
-    async def __call__(self, event: Message | CallbackQuery, user_role: Role) -> bool:
+    async def __call__(self, event: Message | CallbackQuery, role: Role) -> bool:
 
         user = event.from_user
         if user is None:
             return False
 
-        return user_role in self.roles
+        return role in self.roles

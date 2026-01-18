@@ -1,3 +1,3 @@
-from .states import MenuSG
+from .states import MenuSG, AdminMenuSG
 
-__all__ = ["MenuSG"]
+__all__ = ["MenuSG", "AdminMenuSG"]

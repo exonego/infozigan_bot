@@ -10,6 +10,7 @@ class TranslatorRunner:
     def get(self, path: str, **kwargs: PossibleValue) -> str: ...
     menu: Menu
     successful: Successful
+    admin: Admin
 
 class MenuButtonPay:
     @staticmethod
@@ -31,9 +32,9 @@ class MenuInvoiceClub:
     @staticmethod
     def admin() -> Literal["""🤔 Похоже, ты администратор клуба."""]: ...
     @staticmethod
-    def kicked() -> Literal["""☹️ К сожалению, ты был исключен из клуба."""]: ...
+    def kicked() -> Literal["""☹️ К сожалению, ты был(а) исключен(а) из клуба."""]: ...
     @staticmethod
-    def leave(*, username: PossibleValue) -> Literal["""😅 Похоже, ты случайно вышел(вышла) из клуба. Чтобы вступить заново, напиши { $username }"""]: ...
+    def leave(*, username: PossibleValue) -> Literal["""😅 Похоже, ты случайно вышел/вышла из клуба. Чтобы вступить заново, напиши { $username }"""]: ...
     @staticmethod
     def title() -> Literal["""Участие в клубе"""]: ...
     @staticmethod
@@ -95,24 +96,77 @@ class SuccessfulPaymentMentor:
 
 class SuccessfulPaymentAdminMentor:
     @staticmethod
-    def left(*, first_name: PossibleValue, username: PossibleValue) -> Literal["""{ $first_name } @{ $username } оплатил(а) Доступ + Наставничество"""]: ...
+    def left(*, first_name: PossibleValue, username: PossibleValue) -> Literal["""{ $first_name } ( @{ $username } ) оплатил(а) Доступ + Наставничество"""]: ...
     @staticmethod
-    def member(*, first_name: PossibleValue, username: PossibleValue) -> Literal["""{ $first_name } @{ $username } оплатил(а) Наставничество"""]: ...
+    def member(*, first_name: PossibleValue, username: PossibleValue) -> Literal["""{ $first_name } ( @{ $username } ) оплатил(а) Наставничество"""]: ...
 
 class SuccessfulPaymentAdmin:
     mentor: SuccessfulPaymentAdminMentor
 
     @staticmethod
-    def club(*, first_name: PossibleValue, username: PossibleValue) -> Literal["""{ $first_name } @{ $username } оплатил(а) Доступ в клуб"""]: ...
+    def club(*, first_name: PossibleValue, username: PossibleValue) -> Literal["""{ $first_name } ( @{ $username } ) оплатил(а) Доступ в клуб"""]: ...
 
 class SuccessfulPayment:
     mentor: SuccessfulPaymentMentor
     admin: SuccessfulPaymentAdmin
 
     @staticmethod
-    def club(*, link: PossibleValue) -> Literal["""🎉 Поздравляю! Ты уже состоишь в клубе.
-Поздравляю с выгодным вложением! Теперь ты имеешь доступ в клуб.
+    def club(*, link: PossibleValue) -> Literal["""Поздравляю с выгодным вложением! Теперь ты имеешь доступ в клуб.
 Присоединяйся { $link } и начинай проходить уроки!"""]: ...
 
 class Successful:
     payment: SuccessfulPayment
+
+class AdminButton:
+    @staticmethod
+    def back() -> Literal["""⬅️ Назад"""]: ...
+
+class AdminMenuButton:
+    @staticmethod
+    def analytics() -> Literal["""📊 Аналитика"""]: ...
+    @staticmethod
+    def price() -> Literal["""💵 Задать цену"""]: ...
+    @staticmethod
+    def mailing() -> Literal["""✉️ Рассылка"""]: ...
+    @staticmethod
+    def user() -> Literal["""👤 Перейти в меню пользователя"""]: ...
+
+class AdminMenuPriceButtonMentor:
+    @staticmethod
+    def left() -> Literal["""🤖👨‍🏫 Доступ + Наставничество"""]: ...
+    @staticmethod
+    def member() -> Literal["""👨‍🏫 Наставничество"""]: ...
+
+class AdminMenuPriceButton:
+    mentor: AdminMenuPriceButtonMentor
+
+    @staticmethod
+    def club() -> Literal["""🤖 Доступ в клуб"""]: ...
+
+class AdminMenuPriceSet:
+    @staticmethod
+    def text() -> Literal["""Задайте цену для товара, обязательно укажите копейки после точки! Формат: Р.КК"""]: ...
+    @staticmethod
+    def finish(*, price: PossibleValue, product: PossibleValue) -> Literal["""Новая цена для { $product }: { $price }"""]: ...
+
+class AdminMenuPrice:
+    button: AdminMenuPriceButton
+    set: AdminMenuPriceSet
+
+    @staticmethod
+    def text() -> Literal["""Выберите товар, для которого хотите задать цену"""]: ...
+
+class AdminMenu:
+    button: AdminMenuButton
+    price: AdminMenuPrice
+
+    @staticmethod
+    def text(*, club_price: PossibleValue, mentor_price: PossibleValue, mentor_upgrade_price: PossibleValue) -> Literal["""Добро пожаловать в админ-панель бота!
+
+Цена для Доступ в клуб: { $club_price } ₽
+Цена для Доступ + Наставничество: { $mentor_price } ₽
+Цена для Наставничество: { $mentor_upgrade_price } ₽"""]: ...
+
+class Admin:
+    button: AdminButton
+    menu: AdminMenu
