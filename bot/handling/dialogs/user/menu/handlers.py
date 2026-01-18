@@ -12,13 +12,14 @@ from fluentogram import TranslatorRunner
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from bot.enums.levels import Level
-from database import User
-from utils.business_logic import get_cur_price
+from database import User, Requests
 
 if TYPE_CHECKING:
     from I18N.locales.stub import TranslatorRunner  # type: ignore
 
 logger = logging.getLogger(__name__)
+
+requests = Requests()
 
 
 async def send_invoice_club_handler(
@@ -39,7 +40,9 @@ async def send_invoice_club_handler(
         await dialog_manager.done()
 
         yoo_token: SecretStr = dialog_manager.middleware_data.get("yoo_token")
-        cur_price_club: Decimal = await get_cur_price(session=session, title="club")
+        cur_price_club: Decimal = await requests.prices.get_cur_price(
+            session=session, title="club"
+        )
 
         await callback.message.answer_invoice(
             title=i18n.menu.invoice.club.title(),
@@ -79,7 +82,9 @@ async def send_invoice_mentor_handler(
     yoo_token: SecretStr = dialog_manager.middleware_data.get("yoo_token")
 
     if user_status == ChatMemberStatus.LEFT and db_user.level == Level.FREE:
-        cur_price_mentor: Decimal = await get_cur_price(session=session, title="mentor")
+        cur_price_mentor: Decimal = await requests.prices.get_cur_price(
+            session=session, title="mentor"
+        )
 
         await dialog_manager.done()
 
@@ -95,7 +100,7 @@ async def send_invoice_mentor_handler(
         user_status in (ChatMemberStatus.MEMBER, ChatMemberStatus.RESTRICTED)
         and db_user.level == Level.CLUB
     ):
-        cur_price_mentor_upgrade: Decimal = await get_cur_price(
+        cur_price_mentor_upgrade: Decimal = await requests.prices.get_cur_price(
             session=session, title="mentor_upgrade"
         )
 

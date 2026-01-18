@@ -10,7 +10,7 @@ from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
 from bot.handling.handlers.start_command import start_router
-from bot.handling.handlers.user.payment import payment_router
+from bot.handling.handlers.user import user_router
 from bot.handling.dialogs import dialog_user_router
 from bot.handling.middlewares import (
     DbSessionMiddleware,
@@ -69,7 +69,7 @@ async def main(config: Config) -> None:
 
     # Include routers
     logger.info("Including routers into dispatcher...")
-    dp.include_routers(start_router, dialog_user_router, payment_router)
+    dp.include_routers(start_router, user_router, dialog_user_router)
 
     # Register middlewares
     logger.info("Registration middlewares...")

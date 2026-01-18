@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 
 from . import users
+from . import prices
 
 
 @dataclass
@@ -23,5 +24,13 @@ class Users:
 
 
 @dataclass
+class Prices:
+    @property
+    def get_cur_price(self):
+        return prices.get_cur_price
+
+
+@dataclass
 class Requests:
     users: Users = field(default_factory=Users)
+    prices: Prices = field(default_factory=Prices)

@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 
 from aiogram import Bot, Router, F
 from aiogram.types import Message, PreCheckoutQuery
-from aiogram.enums import ContentType, ChatMemberStatus
+from aiogram.enums import ContentType
 from sqlalchemy.ext.asyncio import AsyncSession
 from fluentogram import TranslatorRunner
 
